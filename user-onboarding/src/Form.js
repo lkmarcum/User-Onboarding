@@ -3,28 +3,43 @@ import axios from "axios";
 import { Form, Field, withFormik } from "formik";
 import * as Yup from "yup";
 
-const LoginForm = () => {
-  const [user, setUser] = useState({});
+const LoginForm = ({ errors, touched, values, handleSubmit, status }) => {
+  const [users, setUsers] = useState([]);
+  console.log(users);
 
   useEffect(() => {
     if (status) {
-      setUser([...user, status]);
+      setUsers([...users, status]);
     }
-  });
+  }, [status]);
 
   return (
     <div className="login-form">
-      <h1>Login</h1>
       <Form>
+        <h1>Login</h1>
         <Field type="text" name="name" placeholder="Name" />
+        {touched.name && errors.name && <p className="error">{errors.name}</p>}
         <Field type="text" name="email" placeholder="Email" />
+        {touched.email && errors.email && (
+          <p className="error">{errors.email}</p>
+        )}
         <Field type="password" name="password" placeholder="Password" />
+        {touched.password && errors.password && (
+          <p className="error">{errors.password}</p>
+        )}
         <label className="checkbox-container">
-          I agree to the Terms of Service
-          <Field type="checkbox" name="tos" />
+          <Field type="checkbox" name="tos" checked={values.tos} />
+          {touched.tos && errors.tos && <p className="error">{errors.tos}</p>}I
+          agree to the Terms of Service
         </label>
         <button type="submit">Submit</button>
       </Form>
+      <div className="user-list">
+        <h1>Users</h1>
+        {users.map(user => (
+          <h3>{user.name}</h3>
+        ))}
+      </div>
     </div>
   );
 };
@@ -47,8 +62,20 @@ const FormikLoginForm = withFormik({
     password: Yup.string()
       .min(8, "Password must be at least 8 characters")
       .required("Password is required"),
-    tos: Yup.boolean(true).required("Please agree to the ToS")
-  })
+    tos: Yup.boolean()
+      .oneOf([true], "Please agree to the ToS")
+      .required()
+  }),
+
+  handleSubmit(values, { setStatus }) {
+    axios
+      .post(`https://reqres.in/api/users`, values)
+      .then(res => {
+        setStatus(res.data);
+        console.log("Server response: ", res);
+      })
+      .catch(err => console.log(err.response));
+  }
 })(LoginForm);
 
 export default FormikLoginForm;
