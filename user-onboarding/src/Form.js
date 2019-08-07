@@ -28,3 +28,27 @@ const LoginForm = () => {
     </div>
   );
 };
+
+const FormikLoginForm = withFormik({
+  mapPropsToValues({ name, email, password, tos }) {
+    return {
+      name: name || "",
+      email: email || "",
+      password: password || "",
+      tos: tos || false
+    };
+  },
+
+  validationSchema: Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    email: Yup.string()
+      .email("Enter a valid email")
+      .required("Email is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
+    tos: Yup.boolean(true).required("Please agree to the ToS")
+  })
+})(LoginForm);
+
+export default FormikLoginForm;
