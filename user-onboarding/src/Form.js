@@ -37,7 +37,7 @@ const LoginForm = ({ errors, touched, values, handleSubmit, status }) => {
       <div className="user-list">
         <h1>Users</h1>
         {users.map(user => (
-          <h3>> {user.name}</h3>
+          <h3>&#8658; {user.name}</h3>
         ))}
       </div>
     </div>
